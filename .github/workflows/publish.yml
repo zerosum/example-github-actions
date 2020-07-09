@@ -1,4 +1,4 @@
-name: publish
+name: release with tag
 
 on:
   push:
@@ -6,14 +6,10 @@ on:
       - 'v*'
 
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  release:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
     - name: build
@@ -30,9 +26,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
         tag_name: ${{ github.ref }}
-        # The name of the release. For example, `Release v1.0.1`
         release_name: Release ${{ github.ref }}
 
     - name: Upload a Release Asset
@@ -40,11 +34,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        # The URL for uploading assets to the release
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # The path to the asset you want to upload
-        asset_path: ./output/release.zip 
-        # The name of the asset you want to upload
-        asset_name: release.zip
-        # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
+        asset_path: ./output/release.zip
+        asset_name: release-${{ github.ref }}.zip
         asset_content_type: application/zip
